@@ -7,6 +7,7 @@ import TableHead from '@material-ui/core/TableHead';
 import TableBody from '@material-ui/core/TableBody';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import { withStyles } from '@material-ui/core/styles';
 
 const styles = theme => ({
@@ -17,18 +18,23 @@ const styles = theme => ({
   },
   table: {
     minWidth: 1080
+  },
+  progress:{
+    margin: theme.spacing.uint * 2
   }
 
-})
+});
 
 
 class App extends Component{
 
   state = {
-    customers:""
+    customers:"",
+    completed: 0
   }
 
   componentDidMount()  {
+    this.timer = setInterval(this.progress, 20);
     this.callApi()
     .then(res => this.setState({customers: res}))
     .catch(err => console.log(err) );
@@ -40,6 +46,10 @@ class App extends Component{
     return body;
   }
 
+  progress = () => {
+    const {completed} = this.state;
+    this.setState({completed: completed >= 100 ? 0 : completed + 1 });
+  }
 
   render() {
     const { classes } = this.props;
@@ -73,7 +83,12 @@ class App extends Component{
                     />
                     );
                 })
-                : ""
+                : 
+                <TableRow>
+                  <TableCell colSpan="6" align="center">
+                    <CircularProgress classNmae={classes.progress} variant="determinate" value={this.state.completed} />
+                  </TableCell>
+                </TableRow>
               }
         </TableBody>
         </Table>
